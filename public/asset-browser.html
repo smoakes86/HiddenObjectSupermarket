@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Browser - Hidden Object Supermarket</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            padding: 20px;
+        }
+        h1 { text-align: center; margin-bottom: 20px; color: #4caf50; }
+        .instructions {
+            background: #2d3436;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .container { display: flex; gap: 20px; }
+        .panel {
+            flex: 1;
+            background: #2d3436;
+            border-radius: 8px;
+            padding: 15px;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+        .panel h2 {
+            margin-bottom: 15px;
+            color: #ffd700;
+            position: sticky;
+            top: 0;
+            background: #2d3436;
+            padding: 5px 0;
+        }
+        .category {
+            margin-bottom: 20px;
+        }
+        .category h3 {
+            color: #4caf50;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #4caf50;
+            padding-bottom: 5px;
+        }
+        .asset-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+        }
+        .asset-item {
+            background: #353b48;
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        .asset-item:hover {
+            background: #4a5568;
+            transform: scale(1.05);
+        }
+        .asset-item.selected {
+            border-color: #4caf50;
+            background: #2d5a2d;
+        }
+        .asset-item img {
+            width: 64px;
+            height: 80px;
+            object-fit: contain;
+            background: #1a1a2e;
+            border-radius: 4px;
+        }
+        .asset-item .name {
+            font-size: 10px;
+            margin-top: 5px;
+            word-break: break-all;
+            color: #aaa;
+        }
+        .product-slot {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: #353b48;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .product-slot .slot-image {
+            width: 64px;
+            height: 80px;
+            background: #1a1a2e;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 24px;
+        }
+        .product-slot .slot-image img {
+            width: 64px;
+            height: 80px;
+            object-fit: contain;
+        }
+        .product-slot .slot-info {
+            flex: 1;
+        }
+        .product-slot .slot-name {
+            font-weight: bold;
+            color: #fff;
+        }
+        .product-slot .slot-source {
+            font-size: 12px;
+            color: #888;
+        }
+        .product-slot.active {
+            border: 2px solid #ffd700;
+        }
+        .product-slot .clear-btn {
+            background: #e74c3c;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .export-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+        .export-btn:hover {
+            background: #45a049;
+        }
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .filter-tab {
+            padding: 8px 15px;
+            background: #353b48;
+            border: none;
+            color: #fff;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        .filter-tab.active {
+            background: #4caf50;
+        }
+        #output {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #2d3436;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 80%;
+            max-height: 80%;
+            overflow: auto;
+            display: none;
+            z-index: 1000;
+        }
+        #output.show { display: block; }
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            z-index: 999;
+        }
+        #overlay.show { display: block; }
+        #output pre {
+            background: #1a1a2e;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        #output button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #4caf50;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>🛒 Asset Browser - Hidden Object Supermarket</h1>
+
+    <div class="instructions">
+        <strong>Instructions:</strong> Click a product slot on the right, then click an asset on the left to assign it.
+        When done, click "Generate Copy Commands" to get the file copy commands.
+    </div>
+
+    <div class="container">
+        <div class="panel">
+            <h2>Available Assets (438)</h2>
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="all">All</button>
+                <button class="filter-tab" data-filter="carb">Carb (50)</button>
+                <button class="filter-tab" data-filter="condiment">Condiment (130)</button>
+                <button class="filter-tab" data-filter="green">Green (140)</button>
+                <button class="filter-tab" data-filter="protein">Protein (117)</button>
+            </div>
+            <div class="asset-grid" id="assetGrid"></div>
+        </div>
+
+        <div class="panel">
+            <h2>Products to Assign (50)</h2>
+            <div id="productSlots"></div>
+        </div>
+    </div>
+
+    <button class="export-btn" onclick="exportCommands()">Generate Copy Commands</button>
+
+    <div id="overlay" onclick="closeOutput()"></div>
+    <div id="output">
+        <h3>Copy Commands</h3>
+        <pre id="commandOutput"></pre>
+        <button onclick="closeOutput()">Close</button>
+    </div>
+
+    <script>
+        const products = [
+            // Produce
+            { id: 'apple', category: 'Produce' },
+            { id: 'green_apple', category: 'Produce' },
+            { id: 'banana', category: 'Produce' },
+            { id: 'orange', category: 'Produce' },
+            { id: 'lemon', category: 'Produce' },
+            { id: 'tomato', category: 'Produce' },
+            { id: 'carrot', category: 'Produce' },
+            { id: 'broccoli', category: 'Produce' },
+            { id: 'grape', category: 'Produce' },
+            { id: 'watermelon', category: 'Produce' },
+            // Cereal
+            { id: 'corn_flakes', category: 'Cereal' },
+            { id: 'oat_rings', category: 'Cereal' },
+            { id: 'choco_puffs', category: 'Cereal' },
+            { id: 'fruit_loops', category: 'Cereal' },
+            { id: 'honey_crunch', category: 'Cereal' },
+            { id: 'granola', category: 'Cereal' },
+            { id: 'rice_pops', category: 'Cereal' },
+            { id: 'wheat_bites', category: 'Cereal' },
+            // Snacks
+            { id: 'chips', category: 'Snacks' },
+            { id: 'pretzels', category: 'Snacks' },
+            { id: 'cookies', category: 'Snacks' },
+            { id: 'crackers', category: 'Snacks' },
+            { id: 'popcorn', category: 'Snacks' },
+            { id: 'candy', category: 'Snacks' },
+            { id: 'nuts', category: 'Snacks' },
+            { id: 'gummy', category: 'Snacks' },
+            // Drinks
+            { id: 'milk', category: 'Drinks' },
+            { id: 'orange_juice', category: 'Drinks' },
+            { id: 'apple_juice', category: 'Drinks' },
+            { id: 'water', category: 'Drinks' },
+            { id: 'soda_red', category: 'Drinks' },
+            { id: 'soda_blue', category: 'Drinks' },
+            { id: 'soda_green', category: 'Drinks' },
+            { id: 'coffee', category: 'Drinks' },
+            // Frozen
+            { id: 'ice_cream_choc', category: 'Frozen' },
+            { id: 'ice_cream_van', category: 'Frozen' },
+            { id: 'ice_cream_straw', category: 'Frozen' },
+            { id: 'frozen_pizza', category: 'Frozen' },
+            { id: 'frozen_peas', category: 'Frozen' },
+            { id: 'fish_sticks', category: 'Frozen' },
+            { id: 'frozen_fries', category: 'Frozen' },
+            { id: 'ice_pops', category: 'Frozen' },
+            // Dairy
+            { id: 'cheese_yellow', category: 'Dairy' },
+            { id: 'cheese_white', category: 'Dairy' },
+            { id: 'butter', category: 'Dairy' },
+            { id: 'yogurt_plain', category: 'Dairy' },
+            { id: 'yogurt_straw', category: 'Dairy' },
+            { id: 'yogurt_blue', category: 'Dairy' },
+            { id: 'cream', category: 'Dairy' },
+            { id: 'eggs', category: 'Dairy' }
+        ];
+
+        // Asset files from extras folder
+        const assetFiles = [];
+
+        // Generate asset list from the folder structure
+        for (let i = 1; i <= 50; i++) {
+            assetFiles.push({ name: `carb (${i})`, category: 'carb' });
+        }
+        for (let i = 1; i <= 130; i++) {
+            assetFiles.push({ name: `Condiment (${i})`, category: 'condiment' });
+        }
+        for (let i = 1; i <= 140; i++) {
+            assetFiles.push({ name: `green (${i})`, category: 'green' });
+        }
+        for (let i = 1; i <= 117; i++) {
+            assetFiles.push({ name: `Protein (${i})`, category: 'protein' });
+        }
+
+        const assignments = {};
+        let activeSlot = null;
+
+        function renderAssets(filter = 'all') {
+            const grid = document.getElementById('assetGrid');
+            grid.innerHTML = '';
+
+            const filtered = filter === 'all'
+                ? assetFiles
+                : assetFiles.filter(a => a.category === filter);
+
+            filtered.forEach(asset => {
+                const div = document.createElement('div');
+                div.className = 'asset-item';
+                div.dataset.name = asset.name;
+
+                // Check if this asset is already assigned
+                const assignedTo = Object.entries(assignments).find(([k, v]) => v === asset.name);
+                if (assignedTo) {
+                    div.classList.add('selected');
+                }
+
+                div.innerHTML = `
+                    <img src="assets/images/extras/${asset.name}.png" alt="${asset.name}">
+                    <div class="name">${asset.name}</div>
+                `;
+                div.onclick = () => selectAsset(asset.name);
+                grid.appendChild(div);
+            });
+        }
+
+        function renderProducts() {
+            const container = document.getElementById('productSlots');
+            container.innerHTML = '';
+
+            let currentCategory = '';
+            products.forEach(product => {
+                if (product.category !== currentCategory) {
+                    currentCategory = product.category;
+                    const catDiv = document.createElement('div');
+                    catDiv.className = 'category';
+                    catDiv.innerHTML = `<h3>${currentCategory}</h3>`;
+                    container.appendChild(catDiv);
+                }
+
+                const div = document.createElement('div');
+                div.className = 'product-slot';
+                div.id = `slot-${product.id}`;
+
+                const assigned = assignments[product.id];
+                div.innerHTML = `
+                    <div class="slot-image">
+                        ${assigned
+                            ? `<img src="assets/images/extras/${assigned}.png">`
+                            : '?'}
+                    </div>
+                    <div class="slot-info">
+                        <div class="slot-name">${product.id}</div>
+                        <div class="slot-source">${assigned || 'Click to assign'}</div>
+                    </div>
+                    ${assigned ? `<button class="clear-btn" onclick="clearSlot('${product.id}', event)">✕</button>` : ''}
+                `;
+                div.onclick = () => selectSlot(product.id);
+                container.appendChild(div);
+            });
+        }
+
+        function selectSlot(productId) {
+            // Remove active from all
+            document.querySelectorAll('.product-slot').forEach(s => s.classList.remove('active'));
+            // Add active to selected
+            document.getElementById(`slot-${productId}`).classList.add('active');
+            activeSlot = productId;
+        }
+
+        function selectAsset(assetName) {
+            if (!activeSlot) {
+                alert('First click on a product slot on the right to select it.');
+                return;
+            }
+
+            // Remove this asset from any previous assignment
+            Object.keys(assignments).forEach(key => {
+                if (assignments[key] === assetName) {
+                    delete assignments[key];
+                }
+            });
+
+            // Assign to active slot
+            assignments[activeSlot] = assetName;
+
+            // Re-render
+            renderProducts();
+            renderAssets(document.querySelector('.filter-tab.active').dataset.filter);
+
+            // Move to next unassigned slot
+            const unassigned = products.find(p => !assignments[p.id]);
+            if (unassigned) {
+                selectSlot(unassigned.id);
+            }
+        }
+
+        function clearSlot(productId, event) {
+            event.stopPropagation();
+            delete assignments[productId];
+            renderProducts();
+            renderAssets(document.querySelector('.filter-tab.active').dataset.filter);
+        }
+
+        function exportCommands() {
+            const commands = [];
+            const missing = [];
+
+            products.forEach(product => {
+                if (assignments[product.id]) {
+                    const src = `"assets/images/extras/${assignments[product.id]}.png"`;
+                    const dst = `"assets/images/products/${product.id}.png"`;
+                    commands.push(`copy ${src} ${dst}`);
+                } else {
+                    missing.push(product.id);
+                }
+            });
+
+            let output = '# Windows batch commands to copy assigned assets:\n\n';
+            output += commands.join('\n');
+
+            if (missing.length > 0) {
+                output += '\n\n# Missing assignments:\n# ' + missing.join(', ');
+            }
+
+            output += '\n\n# JSON mapping for reference:\n';
+            output += JSON.stringify(assignments, null, 2);
+
+            document.getElementById('commandOutput').textContent = output;
+            document.getElementById('overlay').classList.add('show');
+            document.getElementById('output').classList.add('show');
+        }
+
+        function closeOutput() {
+            document.getElementById('overlay').classList.remove('show');
+            document.getElementById('output').classList.remove('show');
+        }
+
+        // Filter tabs
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.onclick = () => {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                renderAssets(tab.dataset.filter);
+            };
+        });
+
+        // Initial render
+        renderAssets();
+        renderProducts();
+    </script>
+</body>
+</html>

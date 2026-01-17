@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Downloaded assets (large files, not needed for build)
+public/assets/downloads/
+public/assets/images/extras/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+
+# Claude Code
+.claude/
+
+# Downloaded RAR files
+*.rar
+
+# Temp files
+NUL
+
+# Old canvas version (optional, keeping Phaser version)
+# index-canvas.html
+# js/
+# css/

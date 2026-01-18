@@ -15,7 +15,7 @@ const config = {
         min: { width: 320, height: 480 },
         max: { width: 420, height: 900 }
     },
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#FFF8E7',
     scene: [BootScene, StartScene, GameScene, LevelCompleteScene],
     render: {
         pixelArt: false,

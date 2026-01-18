@@ -51,22 +51,27 @@ export default class BootScene extends Phaser.Scene {
         const products = [
             // Produce
             'apple', 'green_apple', 'banana', 'orange', 'lemon',
-            'tomato', 'carrot', 'broccoli', 'grape', 'watermelon',
+            'tomato', 'carrot', 'broccoli', 'bunch_of_grapes', 'watermelon',
             // Cereal
-            'corn_flakes', 'oat_rings', 'choco_puffs', 'fruit_loops',
-            'honey_crunch', 'granola', 'rice_pops', 'wheat_bites',
+            'cereal_box_of_corn_flakes', 'cereal_box_of_oat_rings',
+            'cereal_box_of_choco_puffs', 'cereal_box_of_fruit_loops',
+            'cereal_box_of_honey_crunch', 'cereal_box_of_granola',
+            'cereal_box_of_rice_pops', 'cereal_box_of_wheat_bites',
             // Snacks
-            'chips', 'pretzels', 'cookies', 'crackers', 'popcorn',
-            'candy', 'nuts', 'gummy',
+            'bag_of_chips', 'bag_of_pretzels', 'bag_of_cookies',
+            'bag_of_crackers', 'bag_of_popcorn', 'bag_of_candy',
+            'jar_of_nuts', 'bag_of_gummies',
             // Drinks
-            'milk', 'orange_juice', 'apple_juice', 'water',
-            'soda_red', 'soda_blue', 'soda_green', 'coffee',
+            'milk_bottle', 'orange_juice_carton', 'apple_juice_carton',
+            'bottled_water', 'can_soda_red', 'can_soda_blue',
+            'bottle_soda_green', 'tin_of_coffee',
             // Frozen
             'ice_cream_choc', 'ice_cream_van', 'ice_cream_straw',
-            'frozen_pizza', 'frozen_peas', 'fish_sticks', 'frozen_fries', 'ice_pops',
+            'frozen_pizza', 'box_of_fish_sticks', 'bag_of_frozen_fries',
+            'bag_of_ice_pops',
             // Dairy
             'cheese_yellow', 'cheese_white', 'butter',
-            'yogurt_plain', 'yogurt_straw', 'yogurt_blue', 'cream', 'eggs'
+            'yogurt_straw', 'yogurt_blue', 'bottle_of_cream', 'carton_of_eggs'
         ];
 
         // Load each product image

@@ -40,28 +40,35 @@ export default class GameScene extends Phaser.Scene {
     createEnvironment() {
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
-        const worldWidth = this.levelConfig.itemsPerShelf * 68 + 100;
+        const worldWidth = this.levelConfig.itemsPerShelf * 85 + 60;
 
-        // Background gradient - darker at top for ceiling effect
+        // Warm cream background gradient
         const bg = this.add.graphics();
-        bg.fillGradientStyle(0x0a0a15, 0x0a0a15, 0x1a1a2e, 0x1a1a2e, 1);
+        bg.fillGradientStyle(0xFFF8E7, 0xFFF8E7, 0xFFEED6, 0xFFE8CC, 1);
         bg.fillRect(0, 0, worldWidth, height);
 
-        // Ceiling
+        // Subtle wall pattern (vertical stripes)
+        const wallPattern = this.add.graphics();
+        wallPattern.fillStyle(0xFFE4CC, 0.3);
+        for (let x = 0; x < worldWidth; x += 60) {
+            wallPattern.fillRect(x, 0, 2, height - 120);
+        }
+
+        // Warm header area (store ceiling)
         const ceiling = this.add.graphics();
-        ceiling.fillStyle(0x1a1a1a, 1);
-        ceiling.fillRect(0, 0, worldWidth, 50);
+        ceiling.fillGradientStyle(0xFFE8D6, 0xFFE8D6, 0xFFF0E0, 0xFFF0E0, 1);
+        ceiling.fillRect(0, 0, worldWidth, 55);
 
-        // Ceiling trim
-        ceiling.fillStyle(0x2d2d2d, 1);
-        ceiling.fillRect(0, 45, worldWidth, 8);
-        ceiling.fillStyle(0x3d3d3d, 1);
-        ceiling.fillRect(0, 50, worldWidth, 3);
+        // Decorative molding
+        ceiling.fillStyle(0xD4A574, 1);
+        ceiling.fillRect(0, 50, worldWidth, 6);
+        ceiling.fillStyle(0xE8C4A0, 1);
+        ceiling.fillRect(0, 53, worldWidth, 3);
 
-        // Add ceiling lights
+        // Add warm ceiling lights
         this.createCeilingLights(worldWidth);
 
-        // Create checkered floor
+        // Create warm floor tiles
         this.createFloorTiles(worldWidth, height);
     }
 
@@ -70,113 +77,93 @@ export default class GameScene extends Phaser.Scene {
         const lightY = 25;
 
         for (let x = 100; x < worldWidth; x += lightSpacing) {
-            // Light fixture (dark metal)
+            // Warm pendant light fixture
             const fixture = this.add.graphics();
-            fixture.fillStyle(0x2d2d2d, 1);
-            fixture.fillRect(x - 30, 0, 60, 20);
 
-            // Fixture bottom trim
-            fixture.fillStyle(0x404040, 1);
-            fixture.fillRect(x - 25, 18, 50, 4);
+            // Cord
+            fixture.lineStyle(3, 0x8B7355, 1);
+            fixture.lineBetween(x, 0, x, lightY - 15);
 
-            // Light panel (bright)
-            const lightPanel = this.add.graphics();
-            lightPanel.fillStyle(0xfff8e1, 1);
-            lightPanel.fillRect(x - 20, 20, 40, 8);
-
-            // Light glow effect (larger, semi-transparent)
-            const glow = this.add.graphics();
-
-            // Outer glow
-            glow.fillStyle(0xfff8e1, 0.03);
-            glow.fillCircle(x, lightY + 60, 120);
-
-            // Middle glow
-            glow.fillStyle(0xfff8e1, 0.05);
-            glow.fillCircle(x, lightY + 40, 80);
+            // Lamp shade (warm terracotta)
+            fixture.fillStyle(0xD4A574, 1);
+            fixture.beginPath();
+            fixture.moveTo(x - 25, lightY - 10);
+            fixture.lineTo(x + 25, lightY - 10);
+            fixture.lineTo(x + 18, lightY + 8);
+            fixture.lineTo(x - 18, lightY + 8);
+            fixture.closePath();
+            fixture.fillPath();
 
             // Inner glow
-            glow.fillStyle(0xfff8e1, 0.08);
-            glow.fillCircle(x, lightY + 20, 50);
+            fixture.fillStyle(0xFFE8B0, 1);
+            fixture.fillRect(x - 15, lightY + 5, 30, 5);
 
-            // Bright center
-            glow.fillStyle(0xffffff, 0.15);
-            glow.fillCircle(x, lightY + 10, 25);
+            // Light glow effect
+            const glow = this.add.graphics();
 
-            // Light rays (subtle)
-            const rays = this.add.graphics();
-            rays.fillStyle(0xfff8e1, 0.02);
+            // Warm outer glow
+            glow.fillStyle(0xFFE8B0, 0.04);
+            glow.fillCircle(x, lightY + 50, 100);
 
-            // Left ray
-            rays.beginPath();
-            rays.moveTo(x - 20, 28);
-            rays.lineTo(x - 80, 200);
-            rays.lineTo(x - 40, 200);
-            rays.lineTo(x - 10, 28);
-            rays.closePath();
-            rays.fillPath();
+            // Middle glow
+            glow.fillStyle(0xFFE8B0, 0.06);
+            glow.fillCircle(x, lightY + 35, 60);
 
-            // Right ray
-            rays.beginPath();
-            rays.moveTo(x + 20, 28);
-            rays.lineTo(x + 80, 200);
-            rays.lineTo(x + 40, 200);
-            rays.lineTo(x + 10, 28);
-            rays.closePath();
-            rays.fillPath();
+            // Inner glow
+            glow.fillStyle(0xFFE8B0, 0.1);
+            glow.fillCircle(x, lightY + 20, 35);
         }
     }
 
     createFloorTiles(worldWidth, height) {
         const floorY = height - 120;
         const floorHeight = 120;
-        const tileSize = 40;
+        const tileSize = 45;
 
-        // Floor base
+        // Floor base (warm wood color)
         const floorBase = this.add.graphics();
-        floorBase.fillStyle(0x2a2a2a, 1);
+        floorBase.fillStyle(0xD4A574, 1);
         floorBase.fillRect(0, floorY, worldWidth, floorHeight);
 
-        // Checkered tiles
+        // Wood plank pattern
         const tiles = this.add.graphics();
         const tilesAcross = Math.ceil(worldWidth / tileSize) + 1;
-        const tilesDown = Math.ceil(floorHeight / tileSize) + 1;
 
-        for (let row = 0; row < tilesDown; row++) {
-            for (let col = 0; col < tilesAcross; col++) {
-                const x = col * tileSize;
-                const y = floorY + row * tileSize;
+        for (let row = 0; row < 3; row++) {
+            const offset = row % 2 === 0 ? 0 : tileSize / 2;
+            for (let col = -1; col < tilesAcross; col++) {
+                const x = col * tileSize + offset;
+                const y = floorY + row * 40;
 
-                // Alternate colors for checkered pattern
+                // Alternate wood tones
                 const isLight = (row + col) % 2 === 0;
-                const baseColor = isLight ? 0x3d3d3d : 0x2d2d2d;
+                const baseColor = isLight ? 0xC99B6D : 0xB8895E;
 
                 tiles.fillStyle(baseColor, 1);
-                tiles.fillRect(x, y, tileSize, tileSize);
+                tiles.fillRect(x, y, tileSize - 2, 38);
 
-                // Tile highlight (top-left edges)
-                tiles.fillStyle(isLight ? 0x4a4a4a : 0x383838, 1);
-                tiles.fillRect(x, y, tileSize, 2);
-                tiles.fillRect(x, y, 2, tileSize);
+                // Wood grain highlight
+                tiles.fillStyle(0xFFFFFF, 0.1);
+                tiles.fillRect(x + 5, y + 5, tileSize - 15, 2);
+                tiles.fillRect(x + 10, y + 15, tileSize - 25, 1);
 
-                // Tile shadow (bottom-right edges)
-                tiles.fillStyle(isLight ? 0x333333 : 0x252525, 1);
-                tiles.fillRect(x, y + tileSize - 2, tileSize, 2);
-                tiles.fillRect(x + tileSize - 2, y, 2, tileSize);
+                // Subtle shadow between planks
+                tiles.fillStyle(0x8B6914, 0.3);
+                tiles.fillRect(x + tileSize - 3, y, 3, 38);
             }
         }
 
-        // Floor reflection/shine strip
+        // Floor shine
         const shine = this.add.graphics();
-        shine.fillStyle(0xffffff, 0.03);
-        shine.fillRect(0, floorY + 10, worldWidth, 30);
+        shine.fillStyle(0xFFFFFF, 0.08);
+        shine.fillRect(0, floorY + 5, worldWidth, 25);
 
-        // Baseboard where floor meets shelves
+        // Baseboard (warm wood)
         const baseboard = this.add.graphics();
-        baseboard.fillStyle(0x1a1a1a, 1);
-        baseboard.fillRect(0, floorY - 5, worldWidth, 8);
-        baseboard.fillStyle(0x252525, 1);
-        baseboard.fillRect(0, floorY - 5, worldWidth, 3);
+        baseboard.fillStyle(0x8B6914, 1);
+        baseboard.fillRect(0, floorY - 8, worldWidth, 10);
+        baseboard.fillStyle(0xA67C3D, 1);
+        baseboard.fillRect(0, floorY - 8, worldWidth, 4);
     }
 
     createShelves() {
@@ -186,8 +173,12 @@ export default class GameScene extends Phaser.Scene {
         this.shoppingList = generateShoppingList(this.levelConfig);
         this.shoppingList.forEach(item => item.found = false);
 
+        // Shelf slot dimensions - wider spacing for better visibility
+        const slotWidth = 85;
+        const shelfPadding = 30;
+
         // Calculate world width
-        const shelfWidth = itemsPerShelf * 68 + 40;
+        const shelfWidth = itemsPerShelf * slotWidth + shelfPadding * 2;
         this.worldWidth = shelfWidth;
         this.maxScrollX = Math.max(0, shelfWidth - this.cameras.main.width);
 
@@ -202,7 +193,7 @@ export default class GameScene extends Phaser.Scene {
         const totalSlots = shelfCount * itemsPerShelf;
 
         // Get the pool of available products from the level's categories
-        const productPool = getRandomItems(100, categories); // Get all available products
+        const productPool = getRandomItems(100, categories);
 
         // Create array of products to place on shelves
         const shelfProducts = [];
@@ -212,7 +203,7 @@ export default class GameScene extends Phaser.Scene {
             shelfProducts.push({ ...item, isTarget: true });
         });
 
-        // Fill remaining slots with random products from the pool (allowing duplicates)
+        // Fill remaining slots with random products from the pool
         while (shelfProducts.length < totalSlots) {
             const randomProduct = Phaser.Utils.Array.GetRandom(productPool);
             shelfProducts.push({ ...randomProduct, isTarget: false });
@@ -228,23 +219,24 @@ export default class GameScene extends Phaser.Scene {
 
             // Draw shelf back
             for (let i = 0; i < itemsPerShelf; i++) {
-                const x = 20 + i * 68;
-                this.add.tileSprite(x, y, 68, 110, 'shelf_back').setOrigin(0, 0);
+                const x = shelfPadding + i * slotWidth;
+                this.add.tileSprite(x, y, slotWidth, 110, 'shelf_back').setOrigin(0, 0);
             }
 
             // Draw shelf surface
             for (let i = 0; i < itemsPerShelf; i++) {
-                const x = 20 + i * 68;
-                this.add.tileSprite(x, y + 95, 68, 16, 'shelf_surface').setOrigin(0, 0);
+                const x = shelfPadding + i * slotWidth;
+                this.add.tileSprite(x, y + 95, slotWidth, 16, 'shelf_surface').setOrigin(0, 0);
             }
 
             // Place products - fill EVERY slot
             for (let i = 0; i < itemsPerShelf; i++) {
                 const product = shelfProducts[productIndex];
-                const x = 20 + i * 68 + 34;
-                const prodY = y + 55;
+                const x = shelfPadding + i * slotWidth + slotWidth / 2;
+                const prodY = y + 60;
 
                 const sprite = this.add.sprite(x, prodY, product.id);
+                sprite.setScale(0.65); // Scale products to fit slots
                 sprite.setInteractive({ useHandCursor: true });
                 sprite.productData = product;
                 sprite.isTarget = product.isTarget;
@@ -264,53 +256,81 @@ export default class GameScene extends Phaser.Scene {
         this.uiContainer.setScrollFactor(0);
         this.uiContainer.setDepth(100);
 
-        // Header background
+        // Header background (warm store banner style)
         const headerBg = this.add.graphics();
-        headerBg.fillStyle(0x000000, 0.7);
-        headerBg.fillRect(0, 0, width, 60);
+
+        // Main header background
+        headerBg.fillStyle(0x6BBF59, 1);
+        headerBg.fillRoundedRect(5, 5, width - 10, 55, { tl: 12, tr: 12, bl: 0, br: 0 });
+
+        // Highlight stripe
+        headerBg.fillStyle(0x7DD169, 1);
+        headerBg.fillRect(5, 5, width - 10, 8);
+
+        // Bottom shadow
+        headerBg.fillStyle(0x4A9E3D, 1);
+        headerBg.fillRect(5, 55, width - 10, 5);
+
         this.uiContainer.add(headerBg);
 
-        // Level text
-        this.levelText = this.add.text(20, 18, `Level ${this.currentLevel}`, {
-            fontFamily: 'Segoe UI, Arial, sans-serif',
-            fontSize: '18px',
-            fontStyle: 'bold',
-            color: '#ffffff',
-            backgroundColor: '#ffffff33',
-            padding: { x: 12, y: 6 }
-        });
+        // Level badge
+        const levelBadge = this.add.graphics();
+        levelBadge.fillStyle(0xFFD93D, 1);
+        levelBadge.fillRoundedRect(12, 15, 85, 35, 10);
+        levelBadge.fillStyle(0xE8C42A, 1);
+        levelBadge.fillRoundedRect(12, 42, 85, 8, { tl: 0, tr: 0, bl: 10, br: 10 });
+        this.uiContainer.add(levelBadge);
+
+        this.levelText = this.add.text(54, 32, `Level ${this.currentLevel}`, {
+            fontFamily: 'Fredoka, Arial, sans-serif',
+            fontSize: '16px',
+            fontStyle: '600',
+            color: '#5D4E37'
+        }).setOrigin(0.5);
         this.uiContainer.add(this.levelText);
 
-        // Timer
-        this.timerText = this.add.text(width / 2, 18, '0:00', {
-            fontFamily: 'Segoe UI, Arial, sans-serif',
-            fontSize: '22px',
-            fontStyle: 'bold',
-            color: '#ffffff'
-        }).setOrigin(0.5, 0);
+        // Timer with clock icon style
+        const timerBg = this.add.graphics();
+        timerBg.fillStyle(0xFFFFFF, 0.25);
+        timerBg.fillRoundedRect(width / 2 - 40, 15, 80, 35, 17);
+        this.uiContainer.add(timerBg);
+
+        this.timerText = this.add.text(width / 2, 32, '0:00', {
+            fontFamily: 'Nunito, Arial, sans-serif',
+            fontSize: '20px',
+            fontStyle: '700',
+            color: '#FFFFFF'
+        }).setOrigin(0.5);
         this.uiContainer.add(this.timerText);
 
-        // Score
+        // Score badge
+        const scoreBadge = this.add.graphics();
+        scoreBadge.fillStyle(0xFF8C5A, 1);
+        scoreBadge.fillRoundedRect(width - 97, 15, 85, 35, 10);
+        scoreBadge.fillStyle(0xE07A4A, 1);
+        scoreBadge.fillRoundedRect(width - 97, 42, 85, 8, { tl: 0, tr: 0, bl: 10, br: 10 });
+        this.uiContainer.add(scoreBadge);
+
         const totalScore = this.registry.get('totalScore') || 0;
-        this.scoreText = this.add.text(width - 20, 18, `${totalScore}`, {
-            fontFamily: 'Segoe UI, Arial, sans-serif',
-            fontSize: '18px',
-            fontStyle: 'bold',
-            color: '#ffffff',
-            backgroundColor: '#4caf50cc',
-            padding: { x: 12, y: 6 }
-        }).setOrigin(1, 0);
+        this.scoreText = this.add.text(width - 55, 32, `${totalScore}`, {
+            fontFamily: 'Fredoka, Arial, sans-serif',
+            fontSize: '16px',
+            fontStyle: '600',
+            color: '#FFFFFF'
+        }).setOrigin(0.5);
         this.uiContainer.add(this.scoreText);
 
-        // Shopping list UI (bottom)
+        // Shopping list UI (bottom) - notepad style
         this.createShoppingListUI();
 
         // Feedback text
-        this.feedbackText = this.add.text(width / 2, this.cameras.main.height / 2, '', {
-            fontFamily: 'Segoe UI, Arial, sans-serif',
-            fontSize: '48px',
-            fontStyle: 'bold',
-            color: '#4caf50'
+        this.feedbackText = this.add.text(width / 2, this.cameras.main.height / 2 - 40, '', {
+            fontFamily: 'Fredoka, Arial, sans-serif',
+            fontSize: '42px',
+            fontStyle: '700',
+            color: '#6BBF59',
+            stroke: '#FFFFFF',
+            strokeThickness: 4
         }).setOrigin(0.5).setAlpha(0).setScrollFactor(0).setDepth(101);
 
         // Scroll indicators
@@ -321,19 +341,50 @@ export default class GameScene extends Phaser.Scene {
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
 
-        // Shopping list background
+        // Shopping list background (notepad style)
         const listBg = this.add.graphics();
-        listBg.fillStyle(0x000000, 0.8);
-        listBg.fillRect(0, height - 120, width, 120);
+
+        // Paper background
+        listBg.fillStyle(0xFFFBF0, 1);
+        listBg.fillRoundedRect(5, height - 125, width - 10, 120, { tl: 16, tr: 16, bl: 0, br: 0 });
+
+        // Red line at top (like a notepad)
+        listBg.fillStyle(0xFF8C5A, 1);
+        listBg.fillRect(5, height - 125, width - 10, 4);
+
+        // Subtle lines
+        listBg.lineStyle(1, 0xE8DDD0, 1);
+        for (let y = height - 95; y < height - 10; y += 20) {
+            listBg.lineBetween(15, y, width - 15, y);
+        }
+
+        // Left margin line
+        listBg.lineStyle(2, 0xFFB7B7, 0.5);
+        listBg.lineBetween(35, height - 120, 35, height);
+
+        // Shadow at top
+        listBg.fillStyle(0x5D4E37, 0.08);
+        listBg.fillRect(5, height - 125, width - 10, 10);
+
         this.uiContainer.add(listBg);
 
-        // Title
-        const listTitle = this.add.text(20, height - 115, 'Shopping List:', {
-            fontFamily: 'Segoe UI, Arial, sans-serif',
+        // Title with cart icon
+        const listTitle = this.add.text(50, height - 118, '🛒 Shopping List', {
+            fontFamily: 'Fredoka, Arial, sans-serif',
             fontSize: '14px',
-            color: '#aaaaaa'
+            fontStyle: '600',
+            color: '#8B7355'
         });
         this.uiContainer.add(listTitle);
+
+        // Items found counter
+        this.foundCounter = this.add.text(width - 20, height - 118, '0/' + this.shoppingList.length, {
+            fontFamily: 'Nunito, Arial, sans-serif',
+            fontSize: '14px',
+            fontStyle: '700',
+            color: '#6BBF59'
+        }).setOrigin(1, 0);
+        this.uiContainer.add(this.foundCounter);
 
         // Shopping list items container
         this.shoppingListContainer = this.add.container(0, 0);
@@ -349,55 +400,78 @@ export default class GameScene extends Phaser.Scene {
 
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
-        const startX = 20;
+        const startX = 45;
 
         // Show names on easy/medium levels
         const showNames = this.levelConfig.difficulty === 'easy' || this.levelConfig.difficulty === 'medium';
-        const itemHeight = showNames ? 55 : 40;
-        const startY = height - (showNames ? 95 : 85);
-        const itemWidth = 70;
+        const itemHeight = showNames ? 55 : 42;
+        const startY = height - (showNames ? 95 : 88);
+        const itemWidth = 68;
+
+        // Update found counter
+        const foundCount = this.foundItems.length;
+        if (this.foundCounter) {
+            this.foundCounter.setText(`${foundCount}/${this.shoppingList.length}`);
+        }
 
         this.shoppingList.forEach((item, index) => {
             const x = startX + (index % 5) * itemWidth;
             const y = startY + Math.floor(index / 5) * (itemHeight + 5);
 
-            // Item background
+            // Item card background
             const bg = this.add.graphics();
-            bg.fillStyle(item.found ? 0x4caf50 : 0x333333, 0.8);
-            bg.fillRoundedRect(x, y, 60, itemHeight, 6);
+            if (item.found) {
+                // Found - green with check pattern
+                bg.fillStyle(0x6BBF59, 1);
+                bg.fillRoundedRect(x, y, 60, itemHeight, 8);
+                bg.fillStyle(0x5AAF49, 1);
+                bg.fillRoundedRect(x, y + itemHeight - 8, 60, 8, { tl: 0, tr: 0, bl: 8, br: 8 });
+            } else {
+                // Not found - cream card
+                bg.fillStyle(0xFFF5E6, 1);
+                bg.fillRoundedRect(x, y, 60, itemHeight, 8);
+                bg.lineStyle(2, 0xE8DDD0, 1);
+                bg.strokeRoundedRect(x, y, 60, itemHeight, 8);
+            }
             this.shoppingListContainer.add(bg);
 
             // Product sprite
-            const spriteY = showNames ? y + 16 : y + 20;
+            const spriteY = showNames ? y + 18 : y + 21;
             const sprite = this.add.sprite(x + 30, spriteY, item.id);
-            sprite.setScale(showNames ? 0.35 : 0.4);
+            sprite.setScale(showNames ? 0.38 : 0.42);
             if (item.found) {
-                sprite.setAlpha(0.5);
+                sprite.setAlpha(0.7);
             }
             this.shoppingListContainer.add(sprite);
 
             // Product name (on easier levels)
             if (showNames) {
-                // Shorten long names
                 let displayName = item.name || item.id;
                 if (displayName.length > 8) {
                     displayName = displayName.substring(0, 7) + '.';
                 }
                 const nameText = this.add.text(x + 30, y + itemHeight - 10, displayName, {
-                    fontFamily: 'Segoe UI, Arial, sans-serif',
+                    fontFamily: 'Nunito, Arial, sans-serif',
                     fontSize: '9px',
-                    color: item.found ? '#ffffff' : '#cccccc'
+                    fontStyle: '600',
+                    color: item.found ? '#FFFFFF' : '#8B7355'
                 }).setOrigin(0.5);
                 this.shoppingListContainer.add(nameText);
             }
 
             // Checkmark for found items
             if (item.found) {
-                const check = this.add.text(x + 45, y + 5, '✓', {
+                const checkBg = this.add.graphics();
+                checkBg.fillStyle(0xFFFFFF, 1);
+                checkBg.fillCircle(x + 48, y + 10, 10);
+                this.shoppingListContainer.add(checkBg);
+
+                const check = this.add.text(x + 48, y + 10, '✓', {
                     fontFamily: 'Arial',
-                    fontSize: '20px',
-                    color: '#ffffff'
-                });
+                    fontSize: '14px',
+                    fontStyle: 'bold',
+                    color: '#6BBF59'
+                }).setOrigin(0.5);
                 this.shoppingListContainer.add(check);
             }
         });
@@ -407,19 +481,33 @@ export default class GameScene extends Phaser.Scene {
         const height = this.cameras.main.height;
         const width = this.cameras.main.width;
 
-        // Left indicator
-        this.leftIndicator = this.add.text(15, height / 2 - 60, '◀', {
+        // Left indicator (arrow in circle)
+        const leftBg = this.add.graphics();
+        leftBg.fillStyle(0x5D4E37, 0.3);
+        leftBg.fillCircle(25, height / 2 - 60, 20);
+        this.leftIndicator = this.add.container(0, 0, [leftBg]);
+
+        const leftArrow = this.add.text(25, height / 2 - 60, '◀', {
             fontFamily: 'Arial',
-            fontSize: '32px',
-            color: '#ffffff'
-        }).setOrigin(0.5).setAlpha(0).setScrollFactor(0).setDepth(50);
+            fontSize: '18px',
+            color: '#FFFFFF'
+        }).setOrigin(0.5);
+        this.leftIndicator.add(leftArrow);
+        this.leftIndicator.setAlpha(0).setScrollFactor(0).setDepth(50);
 
         // Right indicator
-        this.rightIndicator = this.add.text(width - 15, height / 2 - 60, '▶', {
+        const rightBg = this.add.graphics();
+        rightBg.fillStyle(0x5D4E37, 0.3);
+        rightBg.fillCircle(width - 25, height / 2 - 60, 20);
+        this.rightIndicator = this.add.container(0, 0, [rightBg]);
+
+        const rightArrow = this.add.text(width - 25, height / 2 - 60, '▶', {
             fontFamily: 'Arial',
-            fontSize: '32px',
-            color: '#ffffff'
-        }).setOrigin(0.5).setAlpha(0.6).setScrollFactor(0).setDepth(50);
+            fontSize: '18px',
+            color: '#FFFFFF'
+        }).setOrigin(0.5);
+        this.rightIndicator.add(rightArrow);
+        this.rightIndicator.setAlpha(0.7).setScrollFactor(0).setDepth(50);
 
         // Pulse animation
         this.tweens.add({
@@ -525,58 +613,80 @@ export default class GameScene extends Phaser.Scene {
 
     showFeedback(type, text) {
         this.feedbackText.setText(text);
-        this.feedbackText.setColor(type === 'correct' ? '#4caf50' : '#f44336');
+        if (type === 'correct') {
+            this.feedbackText.setColor('#6BBF59');
+            this.feedbackText.setStroke('#FFFFFF', 4);
+        } else {
+            this.feedbackText.setColor('#FF6B6B');
+            this.feedbackText.setStroke('#FFFFFF', 4);
+        }
         this.feedbackText.setAlpha(1).setScale(0.5);
 
         this.tweens.add({
             targets: this.feedbackText,
-            scale: { from: 0.5, to: 1.2 },
+            scale: { from: 0.5, to: 1.3 },
+            y: this.feedbackText.y - 30,
             alpha: { from: 1, to: 0 },
-            duration: 600,
-            ease: 'Back.easeOut'
+            duration: 700,
+            ease: 'Back.easeOut',
+            onComplete: () => {
+                this.feedbackText.setY(this.cameras.main.height / 2 - 40);
+            }
         });
     }
 
     playCollectEffect(sprite) {
-        // Scale down and fade
+        const currentScale = sprite.scale;
+
+        // Scale up slightly then shrink to nothing
         this.tweens.add({
             targets: sprite,
             alpha: 0,
-            scaleX: 0,
-            scaleY: 0,
-            duration: 300,
-            ease: 'Back.easeIn'
+            scaleX: currentScale * 1.4,
+            scaleY: currentScale * 1.4,
+            duration: 200,
+            ease: 'Back.easeIn',
+            onComplete: () => {
+                this.tweens.add({
+                    targets: sprite,
+                    scaleX: 0,
+                    scaleY: 0,
+                    duration: 150
+                });
+            }
         });
 
-        // Particle burst
+        // Particle burst with warm colors
         const particles = this.add.particles(sprite.x, sprite.y, 'particle', {
             speed: { min: 100, max: 200 },
-            scale: { start: 0.5, end: 0 },
+            scale: { start: 0.6, end: 0 },
             alpha: { start: 1, end: 0 },
-            tint: 0x4caf50,
-            lifespan: 400,
-            quantity: 10
+            tint: [0x6BBF59, 0xFFD93D, 0xFF8C5A],
+            lifespan: 500,
+            quantity: 12
         });
 
-        this.time.delayedCall(500, () => particles.destroy());
+        this.time.delayedCall(600, () => particles.destroy());
     }
 
     shakeProduct(sprite) {
+        // Red tint flash
+        sprite.setTint(0xFF6B6B);
+
         this.tweens.add({
             targets: sprite,
-            x: { from: sprite.x - 5, to: sprite.x + 5 },
+            x: { from: sprite.x - 6, to: sprite.x + 6 },
             duration: 50,
             yoyo: true,
-            repeat: 5,
+            repeat: 4,
             ease: 'Sine.easeInOut',
             onComplete: () => {
-                sprite.x = sprite.x; // Reset position
+                sprite.clearTint();
             }
         });
     }
 
     playCollectSound() {
-        // Web Audio synthesis for collect sound
         try {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = ctx.createOscillator();
